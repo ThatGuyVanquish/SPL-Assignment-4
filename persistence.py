@@ -22,7 +22,6 @@ class Order(object):
         self.hat = hat
 
 # DAO
-
 class _Hats:
     def __init__(self, conn):
         self._conn = conn
@@ -32,10 +31,24 @@ class _Hats:
     
     def find(self, hat_topping):
         c = self._conn.cursor()
-        c.execute("SELECT id,topping FROM Hats WHERE topping = ?", [hat_topping])
-        return Hats(*c.fetchone())
+        c.execute("SELECT id FROM Hats WHERE topping = ?", [hat_topping])
+        return Hat(*c.fetchone())
 
-class Suppliers:
+    def order(self, hat_id):
+        c = self._conn.cursor()
+        c.execute("SELECT id FROM Hats WHERE id = ?", [hat_id])
+        current_hat = Hat(*c.fetchone())
+        if current_hat = None:
+            return None
+        c.execute("SELECT id FROM Hats WHERE topping = ?", [current_hat.topping])
+        returned_hat = Hat(*c.fetchone())
+        if returned_hat.quantity - 1 == 0:
+            c.execute("DELETE FROM Hats WHERE id = ?", [returned_hat.id])
+        else:
+            c.execute("UPDATE Hats SET quantity = ? WHERE id = ?", [returned_hat.quantity - 1, returned_hat.id])
+        return returned_hat
+
+class _Suppliers:
     def __init__(self, conn):
         self._conn = conn
     
@@ -44,10 +57,10 @@ class Suppliers:
     
     def find(self, supplier_id):
         c = self._conn.cursor()
-        c.execute("SELECT id,name FROM Suppliers WHERE id = ?", [supplier_id])
-        return Suppliers(*c.fetchone())
+        c.execute("SELECT id FROM Suppliers WHERE id = ?", [supplier_id])
+        return Supplier(*c.fetchone())
 
-class Orders:
+class _Orders:
     def __init__(self, conn):
         self._conn = conn
     
@@ -56,8 +69,8 @@ class Orders:
     
     def find(self, order_id):
         c = self._conn.cursor()
-        c.execute("SELECT id,location,hat FROM Orders WHERE id = ?", [order_id])
-        return Orders(*c.fetchone())
+        c.execute("SELECT id FROM Orders WHERE id = ?", [order_id])
+        return Order(*c.fetchone())
 
 # Repository
 class _Repository(object):
