@@ -1,4 +1,6 @@
 import sqlite3
+import sys
+import atexit
 
 # DTO
 class Hat(object):
@@ -25,32 +27,45 @@ class _Hats:
         self._conn = conn
     
     def insert(self, hat):
-        self._conn.execute("INSERT INTO Hats(id, topping, supplier, quantity) VALUES (?, ?, ?, ?)", [hat.id, hat.topping, hat.supplier, hat.quantity])
+        self._conn.execute("INSERT INTO hats(id, topping, supplier, quantity) VALUES (?, ?, ?, ?)", [hat.id, hat.topping, hat.supplier, hat.quantity])
     
     def find(self, hat_topping):
         c = self._conn.cursor()
-        c.execute("SELECT id FROM Hats WHERE topping = ?", [hat_topping])
-        return Hat(*c.fetchone())
+        c.execute("SELECT id, topping, supplier, quantity FROM hats WHERE topping = ?", [hat_topping])
+        ret = c.fetchone()
+        if ret != None:
+            return Hat(*ret)
+        return None
 
-    def order(self, hat_id):
+    def order(self, topping):
         c = self._conn.cursor()
-        c.execute("SELECT id FROM Hats WHERE id = ?", [hat_id])
-        current_hat = Hat(*c.fetchone())
+        c.execute("SELECT id, topping, supplier, quantity FROM Hats WHERE topping = ?", [topping])
+        possible_hats = c.fetchall()
+        if possible_hats == None:
+            return None
+        min_supplier_id = possible_hats[0][2]
+        min_supplier_idx = 0
+        for i in range(1, len(possible_hats)):
+            if (min_supplier_id > possible_hats[i][2]):
+                min_supplier_id = possible_hats[i][2]
+                min_supplier_idx = i
+        current_hat = Hat(*possible_hats[min_supplier_idx])
         if current_hat.quantity - 1 == 0:
-            c.execute("DELETE FROM Hats WHERE id = ?", [current_hat.id])
+            c.execute("DELETE FROM hats WHERE id = ?", [current_hat.id])
         else:
             c.execute("UPDATE Hats SET quantity = ? WHERE id = ?", [current_hat.quantity - 1, current_hat.id])
+        return current_hat
 
 class _Suppliers:
     def __init__(self, conn):
         self._conn = conn
     
     def insert(self, supplier):
-        self._conn.execute("INSERT INTO Suppliers(id, name) VALUES (?, ?)", [supplier.id, supplier.name])
+        self._conn.execute("INSERT INTO suppliers(id, name) VALUES (?, ?)", [supplier.id, supplier.name])
     
     def find(self, supplier_id):
         c = self._conn.cursor()
-        c.execute("SELECT id FROM Suppliers WHERE id = ?", [supplier_id])
+        c.execute("SELECT id, name FROM suppliers WHERE id = ?", [supplier_id])
         return Supplier(*c.fetchone())
 
 class _Orders:
@@ -58,11 +73,11 @@ class _Orders:
         self._conn = conn
     
     def insert(self, order):
-        self._conn.execute("INSERT INTO Orders(id, location, hat) VALUES (?, ?, ?)", [order.id, order.location, order.hat])
+        self._conn.execute("INSERT INTO orders(id, location, hat) VALUES (?, ?, ?)", [order.id, order.location, order.hat])
     
     def find(self, order_id):
         c = self._conn.cursor()
-        c.execute("SELECT id FROM Orders WHERE id = ?", [order_id])
+        c.execute("SELECT id, location, hat FROM orders WHERE id = ?", [order_id])
         return Order(*c.fetchone())
 
 # Repository
@@ -78,20 +93,24 @@ class _Repository(object):
         self._conn.close()
 
     def create_tables(self):
-        self._conn.executescript("""
-        CREATE TABLE Hats (
-        id INTEGER PRIMARY KEY,
-        topping STRING NOT NULL,
-        supplier INTEGER REFERENCES Suppliers(id),
-        quantity INTEGER NOT NULL
+        cur = self._conn.cursor()
+        cur.executescript("""
+        CREATE TABLE suppliers(
+            id INTEGER PRIMARY KEY,
+            name STRING NOT NULL
         );
-        CREATE TABLE Suppliers (
-        id INTEGER PRIMARY KEY,
-        name STRING NOT NULL
-        );
-        CREATE TABLE Orders (
-        id INTEGER PRIMARY KEY,
-        location STRING NOT NULL,
-        hat INTEGER REFERECES Hats(id)
+        CREATE TABLE hats(
+            id INTEGER PRIMARY KEY,
+            topping STRING NOT NULL,
+            supplier INTEGER REFERENCES suppliers(id),
+            quantity INTEGER NOT NULL
+            );
+        CREATE TABLE orders(
+            id INTEGER PRIMARY KEY,
+            location STRING NOT NULL,
+            hat INTEGER REFERENCES hats(id)
         );
         """)
+
+repo = _Repository(sys.argv[4])
+atexit.register(repo._close)
