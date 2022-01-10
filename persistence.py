@@ -67,8 +67,8 @@ class _Orders:
 
 # Repository
 class _Repository(object):
-    def __init__(self):
-        self._conn = sqlite3.connect(sys.args[3])
+    def __init__(self, db_file):
+        self._conn = sqlite3.connect(db_file)
         self.hats = _Hats(self._conn)
         self.suppliers = _Suppliers(self._conn)
         self.orders = _Orders(self._conn)

@@ -3,7 +3,7 @@ from persistence import _Repository
 import sys
 import atexit
 
-repo = _Repository()
+repo = _Repository(sys.args[3])
 atexit.register(repo._close)
 
 def __main__():
