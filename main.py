@@ -3,11 +3,11 @@ from persistence import _Repository
 import sys
 import atexit
 
-repo = _Repository(sys.args[3])
+repo = _Repository(sys.argv[4])
 atexit.register(repo._close)
 
 def __main__():
-    parse(sys.args[0], sys.args[1], sys.args[2])
+    parse(sys.argv[1], sys.argv[2], sys.argv[3])
     
 if __name__ == __main__:
     __main__()
