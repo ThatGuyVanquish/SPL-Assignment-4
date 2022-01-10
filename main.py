@@ -1,8 +1,7 @@
+from parse import parse
 
 def __main__(self):
     parse()
-    with open('output.txt') as f:
-        i = 0
-        order = repo.orders.find(i)
-        while order != None:
-            
+    
+if __name__ == __main__:
+    __main__()

@@ -38,15 +38,10 @@ class _Hats:
         c = self._conn.cursor()
         c.execute("SELECT id FROM Hats WHERE id = ?", [hat_id])
         current_hat = Hat(*c.fetchone())
-        if current_hat = None:
-            return None
-        c.execute("SELECT id FROM Hats WHERE topping = ?", [current_hat.topping])
-        returned_hat = Hat(*c.fetchone())
-        if returned_hat.quantity - 1 == 0:
-            c.execute("DELETE FROM Hats WHERE id = ?", [returned_hat.id])
+        if current_hat.quantity - 1 == 0:
+            c.execute("DELETE FROM Hats WHERE id = ?", [current_hat.id])
         else:
-            c.execute("UPDATE Hats SET quantity = ? WHERE id = ?", [returned_hat.quantity - 1, returned_hat.id])
-        return returned_hat
+            c.execute("UPDATE Hats SET quantity = ? WHERE id = ?", [current_hat.quantity - 1, current_hat.id])
 
 class _Suppliers:
     def __init__(self, conn):
@@ -75,8 +70,7 @@ class _Orders:
 # Repository
 class _Repository(object):
     def __init__(self):
-        #self._conn = sqlite.connect(args[3])
-        self._conn = sqlite.connect('database.db')
+        self._conn = sqlite.connect(args[3])
         self.hats = _Hats(self._conn)
         self.suppliers = _Suppliers(self._conn)
         self.orders = _Orders(self._conn)
