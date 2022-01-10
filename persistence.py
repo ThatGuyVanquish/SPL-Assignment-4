@@ -1,6 +1,4 @@
 import sqlite3
-import atexit
-
 
 # DTO
 class Hat(object):
@@ -70,7 +68,7 @@ class _Orders:
 # Repository
 class _Repository(object):
     def __init__(self):
-        self._conn = sqlite.connect(args[3])
+        self._conn = sqlite3.connect(sys.args[3])
         self.hats = _Hats(self._conn)
         self.suppliers = _Suppliers(self._conn)
         self.orders = _Orders(self._conn)
@@ -97,6 +95,3 @@ class _Repository(object):
         hat INTEGER REFERECES Hats(id)
         );
         """)
-
-    repo = _Repository()
-    atexit.register(repo._close)

@@ -1,4 +1,7 @@
-import _Repository
+from main import repo
+from persistence import Order
+from persistence import Hat
+from persistence import Supplier
 
 def parse(file1, file2, output_file):
     # Parsing input file
@@ -29,8 +32,8 @@ def parse(file1, file2, output_file):
             order_topping = current_line[1][:-1]
             ordered_hat = repo.hats.find(order_topping)
             if ordered_hat != None:
-                repo.orders.inert_order(Order(i + 1, order_location, ordered_hat.id)
+                repo.orders.inert_order(Order(i + 1, order_location, ordered_hat.id))
                 repo.hats.order(ordered_hat.id)
                 current_supplier = repo.suppliers.find(ordered_hat.supplier)
-                output.write(current_topping + "," + current_supplier.name + "," + order_location))
+                output.write(order_topping + "," + current_supplier.name + "," + order_location)
         output.close()
