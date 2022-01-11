@@ -39,17 +39,11 @@ class _Hats:
 
     def order(self, topping):
         c = self._conn.cursor()
-        c.execute("SELECT id, topping, supplier, quantity FROM Hats WHERE topping = ?", [topping])
-        possible_hats = c.fetchall()
-        if possible_hats == None:
+        c.execute("SELECT id, topping, supplier, quantity FROM Hats WHERE topping = ? ORDER BY supplier ASC", [topping])
+        current_hat = c.fetchone()
+        if current_hat == None:
             return None
-        min_supplier_id = possible_hats[0][2]
-        min_supplier_idx = 0
-        for i in range(1, len(possible_hats)):
-            if (min_supplier_id > possible_hats[i][2]):
-                min_supplier_id = possible_hats[i][2]
-                min_supplier_idx = i
-        current_hat = Hat(*possible_hats[min_supplier_idx])
+        current_hat = Hat(*current_hat)
         if current_hat.quantity - 1 == 0:
             c.execute("DELETE FROM hats WHERE id = ?", [current_hat.id])
         else:
