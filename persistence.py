@@ -39,7 +39,7 @@ class _Hats:
 
     def order(self, topping):
         c = self._conn.cursor()
-        c.execute("SELECT id, topping, supplier, quantity FROM Hats WHERE topping = ? ORDER BY supplier ASC", [topping])
+        c.execute("SELECT id, topping, supplier, quantity FROM hats WHERE topping = ? ORDER BY supplier ASC", [topping])
         current_hat = c.fetchone()
         if current_hat == None:
             return None
@@ -47,7 +47,7 @@ class _Hats:
         if current_hat.quantity - 1 == 0:
             c.execute("DELETE FROM hats WHERE id = ?", [current_hat.id])
         else:
-            c.execute("UPDATE Hats SET quantity = ? WHERE id = ?", [current_hat.quantity - 1, current_hat.id])
+            c.execute("UPDATE hats SET quantity = ? WHERE id = ?", [current_hat.quantity - 1, current_hat.id])
         return current_hat
 
 class _Suppliers:
