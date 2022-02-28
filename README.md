@@ -1,5 +1,12 @@
-Assignment 4 in the course Systems Programming in BGU, graded 100.
+BGU Course Systems Programming, Assignment 4 Created by Tom and Nave Grade: 100
 
-In this assignment we were tasked with creating an SQL database using DTO and DAO with python.
+Written in Python
 
+The assignment:
+Create an SQL database using DTO and DAO using python.
+
+Our implementation:
 The program parses through a .txt configuration file in order to create the database, another .txt file to cultivate the orders and then outputs a .txt file to sum up the compelted orders.
+
+Libs:
+	SQLite3
